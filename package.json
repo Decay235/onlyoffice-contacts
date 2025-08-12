@@ -1,0 +1,19 @@
+{
+  "name": "onlyoffice-contacts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node contacts.js output.csv",
+    "test": "playwright test"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "playwright": "^1.54.2"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.54.2"
+  }
+}
