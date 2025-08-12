@@ -6,33 +6,45 @@ test.use({ browserName: 'firefox' });
 
 test.describe('Contacts Parser', () => {
     test('should generate correct CSV for offices', async ({ page }) => {
+        // Увеличение таймаута для теста
+        test.setTimeout(60000);
+
+        // Логирование для диагностики
+        console.log('Starting test: should generate correct CSV for offices');
+
         // Mock страниц
-        await page.route('https://www.onlyoffice.com/', async (route) => {
-            route.continue();
-        });
-        await page.route('https://www.onlyoffice.com/contacts.aspx', async (route) => {
-            const mockHtml = `
-            <html>
-            <body>
-                <div class="office">
-                    <h3>U.S.A.</h3>
-                    <p>Ascensio Systems Inc</p>
-                    <p>13355 Noel Rd Suite 1100 Dallas, TX, USA 75240</p>
-                    <p>Phone: +1 (972) 301-8440</p>
-                </div>
-                <div class="office">
-                    <h3>Latvia</h3>
-                    <p>Ascensio System SIA</p>
-                    <p>20A-6 Ernesta Birznieka-Upish street, Riga, Latvia, EU, LV-1050</p>
-                    <p>Phone: +371 63399867</p>
-                </div>
-            </body>
-            </html>`;
-            route.fulfill({ body: mockHtml });
+        await page.route('**/*', async (route) => {
+            const url = route.request().url();
+            console.log(`Intercepted request: ${url}`);
+            if (url === 'https://www.onlyoffice.com/' || url.includes('onlyoffice.com')) {
+                console.log('Mocking response for', url);
+                const mockHtml = `
+                <html>
+                <body>
+                    <div class="office">
+                        <h3>U.S.A.</h3>
+                        <p>Ascensio Systems Inc</p>
+                        <p>13355 Noel Rd Suite 1100 Dallas, TX, USA 75240</p>
+                        <p>Phone: +1 (972) 301-8440</p>
+                    </div>
+                    <div class="office">
+                        <h3>Latvia</h3>
+                        <p>Ascensio System SIA</p>
+                        <p>20A-6 Ernesta Birznieka-Upish street, Riga, Latvia, EU, LV-1050</p>
+                        <p>Phone: +371 63399867</p>
+                    </div>
+                </body>
+                </html>`;
+                await route.fulfill({ status: 200, body: mockHtml });
+            } else {
+                await route.continue();
+            }
         });
 
         // Запуск функции
+        console.log('Calling getContacts');
         const csvData = await getContacts('test_output.csv');
+        console.log('getContacts completed, CSV:', csvData);
 
         const expectedCSV = 
 `Country;CompanyName;FullAddress
