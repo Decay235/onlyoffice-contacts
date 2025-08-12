@@ -1,6 +1,9 @@
 const { test, expect } = require('@playwright/test');
 const { getContacts } = require('./contacts');
 
+// Настройка Playwright для использования Firefox
+test.use({ browserName: 'firefox' });
+
 test.describe('Contacts Parser', () => {
     test('should generate correct CSV for offices', async ({ page }) => {
         // Mock страниц
@@ -45,4 +48,4 @@ Latvia;Ascensio System SIA;20A-6 Ernesta Birznieka-Upish street, Riga, Latvia, E
         await expect(getContacts('')).rejects.toThrow('Output path must be a non-empty string');
         await expect(getContacts(null)).rejects.toThrow('Output path must be a non-empty string');
     });
-}); 
+});
